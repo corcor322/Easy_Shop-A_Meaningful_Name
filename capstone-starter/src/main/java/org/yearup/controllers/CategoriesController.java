@@ -8,6 +8,7 @@ import org.yearup.data.ProductDao;
 import org.yearup.models.Category;
 import org.yearup.models.Product;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,23 +28,22 @@ public class CategoriesController
         this.categoryDao = categoryDao;
         this.productDao = productDao;
     }
-    
-
-
-
 
     @GetMapping
-    public List<Category> getAll()
-    {
+    public List<Category> getAll(@RequestParam(name = "categoryId", required = true) int categoryId,
+                                 @RequestParam(name = "name", required = true) String name,
+                                 @RequestParam(name = "description", required = false) String description)
+    {   List<Category> categories = new ArrayList<>();
         // find and return all categories
-        return null;
+        return categoryDao.getAllCategories();
     }
 
     // add the appropriate annotation for a get action
+    @GetMapping("/{categoryId}/categories")
     public Category getById(@PathVariable int id)
     {
         // get the category by id
-        return null;
+        return categoryDao.getById(id);
     }
 
     // the url to return all products in category 1 would look like this
@@ -58,7 +58,7 @@ public class CategoriesController
     // add annotation to call this method for a POST action
     // add annotation to ensure that only an ADMIN can call this function
     @PostMapping
-    // TODO: @ResponseStatus(HttpStatus.CREATED) - there's an error here
+    @ResponseStatus(HttpStatus.CREATED)
 
     public Category addCategory(@RequestBody Category category)
     {
