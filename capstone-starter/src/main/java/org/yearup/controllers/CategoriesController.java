@@ -68,21 +68,23 @@ public class CategoriesController
     }
 
     // add annotation to call this method for a PUT (update) action - the url path must include the categoryId
-    // TODO: @PutMapping("/what goes here?")
+    @PutMapping("category/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void updateCategory(@PathVariable int id, @RequestBody Category category)
     {
         // update the category by id
+        categoryDao.update(id, category);
     }
 
 
     // add annotation to call this method for a DELETE action - the url path must include the categoryId
 
-    // TODO: @DeleteMapping("/whatgoeshere?")
+    @DeleteMapping("category/{id}}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable int id)
     {
         // delete the category by id
+        categoryDao.delete(id);
     }
 }
