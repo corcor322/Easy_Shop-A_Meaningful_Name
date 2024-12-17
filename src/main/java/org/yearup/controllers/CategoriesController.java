@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.CategoryDao;
 import org.yearup.data.ProductDao;
 import org.yearup.models.Category;
@@ -34,14 +35,27 @@ public class CategoriesController
     @GetMapping
     public List<Category> getAll()
     {
-        return categoryDao.getAllCategories();
+
+        try {
+            return categoryDao.getAllCategories();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops...our bad");
+        }
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("/{id}")
     public Category getById(@PathVariable int id)
-    {
-        return categoryDao.getById(id);
+    { Category category = null;
+        try {
+            category = categoryDao.getById(id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops...our bad");
+        }
+        if (category == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+            return category;
     }
 
     @PreAuthorize("permitAll()")
@@ -57,16 +71,25 @@ public class CategoriesController
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Category addCategory(@RequestBody Category category)
     {
-        return categoryDao.create(category);
+        try {
+            return categoryDao.create(category);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops...our bad");
+        }
     }
 
 
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCategory(@PathVariable int id, @RequestBody Category category)
     {
-        categoryDao.update(id, category);
+        try {
+            categoryDao.update(id, category);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops...our bad.");
+        }
+
     }
 
 
@@ -75,6 +98,16 @@ public class CategoriesController
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable int id)
     {
-        categoryDao.delete(id);
+        try {
+            Category category = categoryDao.getById(id);
+
+            if (category == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category was not found.");
+            }
+            categoryDao.delete(id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops...our bad.");
+        }
+
     }
 }
